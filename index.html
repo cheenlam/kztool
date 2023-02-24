@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡莉茲小工具</title>
+    <script src="https://unpkg.com/vue@next"></script>
+    <link rel="stylesheet" href="scss/all.css">
+</head>
+<body>
+
+    <div class="gameCount" id="app">
+        <div class="menuSel">
+            <select v-model="lvSel" @change="foodSel = 0,resetAll()">
+                <option value="lv1">1級食譜</option>
+                <option value="lv2">2級食譜</option>
+                <option value="lv3">3級食譜</option>
+            </select>
+
+            <select v-model="foodSel"  @change="resetAll()">
+                <option v-for="item,index in foodName[lvSel]" :key="index" :value="index">{{item.name}}</option>
+            </select>
+        </div>
+
+        <div class="ckboxList">
+            <ul>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>-80%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{Math.floor(foodName[lvSel][foodSel].price*0.2)}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[0]" @change="resetThis(0)">
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>-40%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{Math.floor(foodName[lvSel][foodSel].price*0.6)}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[1]" @change="resetThis(1)">
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>0%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{foodName[lvSel][foodSel].price}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[2]" @change="resetThis(2)">
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>+40%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{Math.floor(foodName[lvSel][foodSel].price*1.4)}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[3]" @change="resetThis(3)">
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>+80%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{Math.floor(foodName[lvSel][foodSel].price*1.8)}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[4]" @change="resetThis(4)">
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <p>
+                            <span>乘數</span>
+                            <span>+120%</span>
+                        </p>
+                        <p>
+                            <span>價格</span>
+                            <span>{{Math.floor(foodName[lvSel][foodSel].price*2.2)}}</span>
+                        </p>
+                        <input type="checkbox" v-model="ckboxState[5]" @change="resetThis(5)">
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="iptList">
+            <label v-show="ckboxState[0]">
+                <p>
+                    <span>收購價格 {{Math.floor(foodName[lvSel][foodSel].price*0.2)}}</span>
+                    <span>收購機率 {{oneDom()}}</span>
+                </p>
+                <input type="number" v-model="iptNum[0]">
+            </label>
+            <label v-show="ckboxState[1]">
+                <p>
+                    <span>收購價格 {{Math.floor(foodName[lvSel][foodSel].price*0.6)}}</span>
+                    <span>收購機率 {{nextDom(1)}}</span>
+                </p>
+                <input type="number" v-model="iptNum[1]">
+            </label>
+            <label v-show="ckboxState[2]">
+                <p>
+                    <span>收購價格 {{foodName[lvSel][foodSel].price}}</span>
+                    <span>收購機率 {{nextDom(2)}}</span>
+                </p>
+                <input type="number" v-model="iptNum[2]">
+            </label>
+            <label v-show="ckboxState[3]">
+                <p>
+                    <span>收購價格 {{Math.floor(foodName[lvSel][foodSel].price*1.4)}}</span>
+                    <span>收購機率 {{nextDom(3)}}</span>
+                </p>
+                <input type="number" v-model="iptNum[3]">
+            </label>
+            <label v-show="ckboxState[4]">
+                <p>
+                    <span>收購價格 {{Math.floor(foodName[lvSel][foodSel].price*1.8)}}</span>
+                    <span>收購機率 {{nextDom(4)}}</span>
+                </p>
+                <input type="number" v-model="iptNum[4]">
+            </label>
+            <label v-show="ckboxState[5]">
+                <p>
+                    <span>收購價格 {{Math.floor(foodName[lvSel][foodSel].price*2.2)}}</span>
+                    <span>收購機率 {{nextDom(5)}}</span>
+                </p>
+                <input type="number" v-model="iptNum[5]">
+            </label>
+        </div>
+    </div>
+
+
+    <script>
+        const app = {
+            data() {
+                return {
+                    ckboxState:[false,false,false,false,false,false],
+                    iptNum:['','','','','',''],
+                    lvSel: 'lv1',
+                    foodSel: 0,
+                    foodName: {
+                        'lv1': [
+                            { name: '烤魚', price: 140 },
+                            { name: '可樂餅', price: 140 },
+                            { name: '暖心田園餐', price: 140 },
+                            { name: '厚魚燒', price: 180 },
+                            { name: '啤酒烤魚', price: 180 },
+                            { name: '紅燴肉湯', price: 180 }
+
+                        ],
+                        'lv2': [
+                            { name: '魚湯', price: 190 },
+                            { name: '蘑菇濃湯', price: 210 },
+                            { name: '海鹽世濤', price: 210 },
+                            { name: '迷迭海灣湯', price: 210 },
+                            { name: '蘋果西達酒', price: 210 },
+                            { name: '海鮮香腸', price: 230 },
+                            { name: '暖陽炒飯', price: 230 },
+                            { name: '經典拉格', price: 230 }
+                        ],
+                        'lv3': [
+                            { name: '海鮮焗飯', price: 250 },
+                            { name: '火焰炒飯', price: 270 },
+                            { name: '煙燻燒肉', price: 270 },
+                            { name: '森林世濤', price: 270 },
+                            { name: '雙料艾爾', price: 270 },
+                            { name: '大王蝦球', price: 300 },
+                            { name: '冰爽純生', price: 300 },
+                            { name: '極寒冰草酒', price: 300 },
+                            { name: '暖身壽喜鍋', price: 300 }
+                        ],
+                    },
+
+                }
+            },
+            methods: {
+                // 總數
+                reTotal:function(){
+                    let total = 0;
+                    this.iptNum.forEach(e => {total+= e == ''? 0 : Number(e);});
+                    return total;
+                },
+                resetAll:function(){
+                    for(let i =0;i<this.iptNum.length;i++){
+                        this.iptNum[i] = '';
+                    }
+                    for(let i =0;i<this.ckboxState.length;i++){
+                        this.ckboxState[i] = false;
+                    }   
+                },
+                resetThis:function(num){
+                    this.iptNum[num] = '';
+                },   
+                oneDom:function(){
+                    let total = this.reTotal();
+                    return this.iptNum[0] == 0 ? '0.00%' :total*0.25 >= this.iptNum[0] ? '100.00%' : `${(total*0.25 / Number(this.iptNum[0]) * 100).toFixed(2) }%`;
+                },
+                nextDom:function(num){
+                    let thisTotal = 0;
+                    let thisCut = 0;
+                    for(let i = 0; i<=num ; i++){ thisTotal+= Number(this.iptNum[i])};
+                    for(let i = 0; i<num ; i++){ thisCut+= Number(this.iptNum[i])};
+                    let total = this.reTotal();
+                    if(this.iptNum[num] == 0){
+                        return '0.00%'
+                    }else if(total*0.25 >=  thisTotal){
+                        return '100.00%'
+                    }else{
+                        return total*0.25 - thisCut <=0 ? '0.00%' : `${((total*0.25 - thisCut) / Number(this.iptNum[num]) * 100).toFixed(2)}%`  
+                    }         
+                }
+            }
+        }
+        Vue.createApp(app).mount('#app')
+    </script>
+  
+</body>
+</html>
