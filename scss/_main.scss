@@ -1,6 +1,9 @@
 body{
     padding: 10px;
 }
+input, textarea {
+    font-size: initial;
+}
 .gameCount{
     max-width: 100%;
     max-width: 450px;
@@ -44,6 +47,7 @@ body{
             border: 1px solid #b0befd;
             border-radius: 5px;
             transition: transform .3s;
+            cursor: pointer;
             &:has(input:checked){
                 background-color: #6678c5;
                 box-shadow: 2px 2px 10px #030303 inset;
